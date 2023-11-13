@@ -1,0 +1,102 @@
+<script type="text/javascript">
+    $( document ).ready( function() {
+    function CustomTimeline( el ) {
+      var self = this,
+          counter = 0,
+          max = 10,
+          $el = $( el ),
+          $iframeTimeline,
+          $iframe,
+          $timeline;
+
+      function check() {
+        $iframe = $el.find( 'iframe' ).first();
+
+        if ( $iframe.hasClass( 'twitter-timeline-rendered' ) && $iframe.contents().find( 'ol' ).length > 0 ) {
+          $iframeTimeline = $iframe.contents().find( 'ol' ).first();
+
+          render();
+        } else if ( counter < max ) {
+          counter++;
+          
+          window.setTimeout( function() {
+            check();
+          }, 1000 );
+        } else {
+          $iframe.show();
+        }
+      }
+
+      function prevTweet( e ) {
+        e.preventDefault();
+
+        $timeline.find( 'li:first-child' ).fadeOut()
+          .siblings( 'li:last-child' ).fadeIn()
+          .prependTo( $timeline );
+
+          return false;
+      }
+
+      function nextTweet( e ) {
+        e.preventDefault();
+
+        $timeline.find( 'li:first-child' ).fadeOut()
+          .next().fadeIn();
+        $timeline.find( 'li:first-child' ).appendTo( $timeline );
+
+        return false;
+      }
+
+      function render() {
+        var prevButton = '<a class="custom-timeline-nav custom-timeline-nav-prev" href="_#"><span class="hide-text">Previous tweet</span></a>',
+            nextButton = '<a class="custom-timeline-nav custom-timeline-nav-next" href="_#"><span class="hide-text">Next tweet</span></a>';
+
+        $iframeTimeline.clone().appendTo( el ).addClass( 'timeline' );
+        $iframe.remove();
+
+        $timeline = $el.find( '.timeline' );
+
+        /*
+        $timeline.children( 'li' ).each( function( index ) {
+          var $permalink = $( this ).find( '.permalink' ),
+              $time = $permalink.find( 'time' );
+
+          $permalink.appendTo( this );
+
+          $time.html( $time.attr( 'aria-label' ).replace( 'Posted ', '' ) );
+        } );
+        */
+
+        $timeline.find( '.timeline-Tweet-actions' ).remove();
+        $timeline.find( '.footer' ).remove();
+        $timeline.find( '.tweet-actions' ).remove();
+        $timeline.find( '.inline-media' ).remove();
+        $timeline.find( '.expand' ).remove();
+        $timeline.find( '.stats-wide' ).remove();
+        $timeline.find( '.timeline-Tweet-media').remove();
+
+        $el.prepend( prevButton );
+        $el.append( nextButton );
+
+        $el.find( '.custom-timeline-nav-prev' ).on( 'click.prev', prevTweet );
+
+        $el.find( '.custom-timeline-nav-next' ).on( 'click.next', nextTweet );
+
+        $timeline.find( 'li:gt(0)' ).hide();
+      }
+
+      self.init = function() {
+        // If the element exists, call check()
+        if ( $el.length > 0 ) {
+          check();
+        }
+      };
+    }
+
+    if ( !$( 'html' ).hasClass( 'lt-ie9' ) ) {
+      var customTimeline = new CustomTimeline( '#twitter-custom-timeline' );
+
+      customTimeline.init();
+    }
+  } );
+</script>
